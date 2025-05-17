@@ -3,31 +3,27 @@
 
 Make a backup of your dotfiles in case things go nuts
 
-## Credits
+**Credits:** Big thanks to @ericjaychi for his original [repo](https://github.com/ericjaychi/sample-dotfiles) and [instructions](https://betterprogramming.pub/managing-your-dotfiles-with-git-4dee603a19a2)
 
-Big thanks to @ericjaychi for his original [repo](https://github.com/ericjaychi/sample-dotfiles) and [instructions](https://betterprogramming.pub/managing-your-dotfiles-with-git-4dee603a19a2)
+## How to use
 
-# How to use
-
-## 1. Fork this repository
-
-And clone it to your local device
+### 1. Fork this repository and clone it to your local device
 
 ```
 git clone git@github.com:ngfuong/dotfiles
 ```
 
-## 2. Copy your dot files
+### 2. Copy your dot files
 
-For example, you can copy your `.bashrc` file from `/home/<username>` directory to your local repository (without the `.` prefix for management purposes)
+For example, you can copy your `.zshrc` file from home directory (`~`) to your local repository (without the `.` prefix for management purposes)
 
 ```
-cp ~/.bashrc ~/dotfiles/bashrc
+cp ~/.zshrc ~/dotfiles/zshrc
 ```
 
 You can overwrite or remove any dot files in the forked repository that is not needed for backup.
 
-## 3. Symlink your files
+### 3. Symlink your files
 
 Edit the **Variables** section in the `make-symlinks.sh` file
 
@@ -56,12 +52,12 @@ chmod +x make-symlinks.sh
 ./make-symlink.sh
 ```
 
-## 4. Backup your files
+### 4. Backup your files
 
 Edit the dotfiles (e.g `.bashrc`) in your home directory normally and the files in your backup repository will be updated automatically.
 If you want to record your changes, enter the local repository and stage the changes.
 
 ```
-git add bashrc
-git commit -m "Updated dot bashrc"
+git add zshrc 
+git commit -m "Updated dot zshrc"
 ```

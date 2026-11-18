@@ -5,6 +5,18 @@ Make a backup of your dotfiles in case things go nuts
 
 **Credits:** Big thanks to @ericjaychi for his original [repo](https://github.com/ericjaychi/sample-dotfiles) and [instructions](https://betterprogramming.pub/managing-your-dotfiles-with-git-4dee603a19a2)
 
+## Fresh machine setup (macOS or apt-based Linux)
+
+Clone the repo, then run the bootstrap script. It installs packages, oh-my-zsh, powerlevel10k, zsh plugins and tmux plugins, then links the dotfiles.
+
+```
+git clone git@github.com:ngfuong/dotfiles ~/dotfiles
+cd ~/dotfiles
+./bootstrap.sh
+```
+
+It is safe to re-run. Existing dotfiles are backed up to `dotfiles_old/`.
+
 ## How to use
 
 ### 1. Fork this repository and clone it to your local device

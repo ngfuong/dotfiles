@@ -1,43 +1,58 @@
 #!/bin/bash
 ############################
-# .make.sh
-# This script creates symlinks from the home directory to any desired dotfiles in ~/dotfiles
+# make-symlinks.sh
+# Creates symlinks from $HOME to the dotfiles in this repository.
+# Existing files are backed up to dotfiles_old/ first.
+# Safe to re-run: entries that are already linked correctly are skipped.
 ############################
 
+set -euo pipefail
+
 ########## Variables
-## Change this #####
 
-# dotfiles directory
-# edit this with the path to the backup repository
-dir=~/dotfiles
+# dotfiles directory (the directory this script lives in)
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# old dotfiles backup directory
-# edit this with the path to make a copy of your dotfiles before running the script
-olddir=~/dotfiles/dotfiles_old
+# backup directory for existing dotfiles that get replaced
+olddir="$dir/dotfiles_old"
 
-# list of files/folders to symlink in homedir
-# edit this with the files you want to backup
+# list of files/folders to symlink into $HOME as ~/.<entry>
+# paths are relative to this repo and must exist here
 # LINUX
-# files="bashrc zshrc tmux.conf config/nvim/init.vim config/i3/config "
+# files="bashrc zshrc tmux.conf config/nvim/init.vim config/i3/config"
 # OSX
-files="zshrc tmux.conf oh-my-zsh config/nvim config/alacritty"
+files="zshrc tmux.conf tmux/scripts config/nvim"
 
 ##########
 
-# create dotfiles_old in homedir
-echo -n "Creating $olddir for backup of any existing dotfiles in ~ ..."
-mkdir -p $olddir
-echo "done"
+mkdir -p "$olddir"
 
-# change to the dotfiles directory
-echo -n "Changing to the $dir directory ..."
-cd $dir
-echo "done"
-
-# move any existing dotfiles in homedir to dotfiles_old directory, then create symlinks from the homedir to any files in the ~/dotfiles directory specified in $files
 for file in $files; do
-  echo "Moving any existing dotfiles from ~ to $olddir"
-  mv ~/.$file $olddir/
-  echo "Creating symlink to $file in home directory."
-  ln -s $dir/$file ~/.$file
+  src="$dir/$file"
+  dst="$HOME/.$file"
+
+  if [ ! -e "$src" ]; then
+    echo "SKIP: $src does not exist in the repo"
+    continue
+  fi
+
+  if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+    echo "OK: $dst already links to $src"
+    continue
+  fi
+
+  # back up anything in the way (a real file/dir or a symlink to somewhere else)
+  if [ -e "$dst" ] || [ -L "$dst" ]; then
+    backup="$olddir/${file//\//_}"
+    if [ -e "$backup" ] || [ -L "$backup" ]; then
+      echo "ERROR: backup target $backup already exists; move it aside and re-run" >&2
+      exit 1
+    fi
+    echo "Backing up $dst -> $backup"
+    mv "$dst" "$backup"
+  fi
+
+  mkdir -p "$(dirname "$dst")"
+  echo "Linking $dst -> $src"
+  ln -s "$src" "$dst"
 done

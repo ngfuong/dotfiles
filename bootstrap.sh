@@ -33,10 +33,12 @@ clone() {
 case "$(uname -s)" in
   Darwin) os="macos" ;;
   Linux)
-    if have apt-get; then os="linux"; else
+    if ! have apt-get; then
       echo "Unsupported Linux distro: only apt-based distros are supported." >&2
       exit 1
-    fi ;;
+    fi
+    # WSL reports "microsoft" in the kernel version string
+    if grep -qi microsoft /proc/version 2>/dev/null; then os="wsl"; else os="linux"; fi ;;
   *) echo "Unsupported OS: $(uname -s)" >&2; exit 1 ;;
 esac
 log "Detected: $os"
@@ -52,6 +54,7 @@ install_packages() {
     log "Installing packages with Homebrew"
     brew install git zsh tmux neovim fzf
   else
+    # linux and wsl both use apt. WSL has no systemd by default, so none is needed here.
     log "Installing packages with apt"
     sudo apt-get update
     sudo apt-get install -y git zsh tmux neovim fzf curl

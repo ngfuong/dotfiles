@@ -29,28 +29,32 @@ Edit the **Variables** section in the `make-symlinks.sh` file
 
 ```
 ########## Variables
-# dotfiles directory
-# edit this with the path to the backup repository
-dir=~/dotfiles
 
-# old dotfiles backup directory
-# edit this with the path to make a copy of your dotfiles before you run the script
-olddir=~/dotfiles/dotfiles_old
+# dotfiles directory (the directory this script lives in)
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# list of files/folders to symlink in homedir
-# edit this with the files you want to backup
-files="bashrc vimrc zshrc config/nvim/init.vim"
+# backup directory for existing dotfiles that get replaced
+olddir="$dir/dotfiles_old"
+
+# list of files/folders to symlink into $HOME as ~/.<entry>
+# paths are relative to this repo and must exist here
+# OSX
+files="zshrc tmux.conf tmux/scripts config/nvim"
 
 ##########
 ```
+
+Each entry becomes `~/.<entry>` (e.g. `zshrc` → `~/.zshrc`). Adjust the `files` list to the files you want to manage.
 
 Run the script (in some case you have to make the file executable before it can be run)
 
 ```
 # make the file executable
 chmod +x make-symlinks.sh
-./make-symlink.sh
+./make-symlinks.sh
 ```
+
+The script is safe to re-run. Entries already linked correctly are skipped. Any existing file or symlink in the way is moved to `dotfiles_old/` first. If a backup with the same name already exists there, the script stops so nothing is overwritten.
 
 ### 4. Backup your files
 
